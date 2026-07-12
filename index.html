@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elkheta Teachers 2027</title>
+    <title>Elkheta Teachers Dashboard 2026 2027</title>
     
     <!-- CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,9 +12,9 @@
     
     <style>
         :root {
-            --elkheta-yellow: #FFDE59; /* Matching your logo */
+            --elkheta-yellow: #FFDE59;
             --elkheta-dark: #333333;
-            --elkheta-bg: #fdfdfd;
+            --elkheta-bg: #f4f7f6;
         }
 
         body { 
@@ -23,157 +23,130 @@
             color: var(--elkheta-dark);
         }
 
-        /* Educational Header */
+        /* Header Style */
         .header-brand {
             background: var(--elkheta-dark);
             color: white;
-            padding: 20px;
-            border-bottom: 6px solid var(--elkheta-yellow);
+            padding: 15px 30px;
+            border-bottom: 5px solid var(--elkheta-yellow);
             margin-bottom: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .logo-img {
-            max-height: 60px;
-            margin-right: 20px;
-        }
+        .logo-img { max-height: 60px; margin-right: 20px; }
 
         /* Filter Section */
         .filter-section {
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            border-left: 5px solid var(--elkheta-yellow);
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
         }
 
-        .form-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #555;
-        }
-
-        .form-select {
-            border: 2px solid #eee;
-            border-radius: 8px;
-        }
-
-        /* Table Styling */
         .table-card {
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 20px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
 
-        .table thead {
-            background: #f8f9fa;
-        }
-
-        .table thead th {
-            color: var(--elkheta-dark);
-            font-weight: 700;
-            border-bottom: 3px solid var(--elkheta-yellow);
-        }
-
+        /* Grade Coloring */
         .grade-tag {
-            background: var(--elkheta-yellow);
-            color: var(--elkheta-dark);
             font-weight: 700;
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            color: white;
+            min-width: 100px;
+            text-align: center;
         }
+        .grade-blue { background-color: #4361ee; }   /* Group 1: 1, 4, 7, 10 */
+        .grade-teal { background-color: #2ec4b6; }   /* Group 2: 2, 5, 8, 11 */
+        .grade-purple { background-color: #7209b7; } /* Group 3: 3, 6, 9, 12 */
+        .grade-default { background-color: #6c757d; }
 
+        /* Status Coloring */
         .status-pill {
-            padding: 5px 15px;
+            padding: 6px 14px;
             border-radius: 30px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 800;
             text-transform: uppercase;
         }
+        .status-terminated { background-color: #dc3545 !important; color: white !important; }
+        .status-active { background-color: #d1e7dd; color: #0f5132; }
+        .status-pending { background-color: #fff3cd; color: #856404; }
 
-        .active-status { background: #e1f7e3; color: #1b5e20; }
-        .pending-status { background: #fff3e0; color: #e65100; }
-
-        .btn-plan {
+        /* Buttons */
+        .btn-elkheta {
             background: var(--elkheta-dark);
             color: var(--elkheta-yellow);
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: 0.3s;
             border: 1px solid var(--elkheta-yellow);
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .btn-elkheta:hover { background: var(--elkheta-yellow); color: var(--elkheta-dark); }
+        
+        .btn-analysis {
+            background: #ffffff;
+            color: #333;
+            border: 1px solid #ced4da;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            border-radius: 6px;
         }
 
-        .btn-plan:hover {
-            background: var(--elkheta-yellow);
-            color: var(--elkheta-dark);
-        }
-
-        #manualSyncBox { display: none; margin-bottom: 20px; }
+        #previewFrame { width: 100%; height: 80vh; border: none; background: #fff; }
+        #manualSyncBox { display: none; }
     </style>
 </head>
 <body>
 
-<!-- TOP HEADER -->
 <div class="header-brand">
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-            <!-- Ensure your logo file is named logo.png in the same folder -->
-            <img src="logo.png" alt="Elkheta Logo" class="logo-img" onerror="this.style.display='none'">
+            <!-- Save your uploaded logo image as logo.png in the same folder -->
+            <img src="logo.png" alt="Elkheta Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/150x60?text=Elkheta+Logo'">
             <div>
-                <h1 class="h3 mb-0 fw-bold">Elkheta Teachers 2027</h1>
-                <p class="mb-0 small text-warning">Quality Education Tracking System</p>
+                <h1 class="h3 mb-0 fw-bold">Elkheta Teachers Dashboard 2026 2027</h1>
+                <p class="mb-0 small text-warning">Quality Control & Performance Tracking</p>
             </div>
         </div>
-        <button class="btn btn-sm btn-outline-warning" onclick="$('#manualSyncBox').slideToggle()">Sync Options</button>
+        <button class="btn btn-sm btn-outline-warning" onclick="$('#manualSyncBox').slideToggle()">Sync Data Manually</button>
     </div>
 </div>
 
-<div class="container-fluid px-5">
+<div class="container-fluid px-4">
 
-    <!-- SYNC OPTIONS -->
-    <div id="manualSyncBox" class="card card-body border-warning">
-        <h6>Data Management</h6>
-        <p class="small text-muted">If the table is empty, paste your Google Sheet data below:</p>
+    <!-- MANUAL SYNC INTERFACE -->
+    <div id="manualSyncBox" class="card card-body mb-4 border-warning shadow-sm">
+        <h6 class="fw-bold">Manual Connection</h6>
+        <p class="small text-muted">If the dashboard doesn't load automatically, copy all cells from your spreadsheet and paste them below:</p>
         <textarea id="csvInput" class="form-control mb-2" rows="3" placeholder="Paste data here..."></textarea>
-        <div class="d-flex gap-2">
-            <button onclick="processManualData()" class="btn btn-dark btn-sm">Update Dashboard</button>
-            <a href="https://docs.google.com/spreadsheets/d/1H8ZGdutwkSTo8Q6JI-6zdAU9fZdZj9valGc8fMGlEEM/edit?usp=sharing" target="_blank" class="btn btn-warning btn-sm">Open Source Sheet</a>
-        </div>
+        <button onclick="processManualData()" class="btn btn-dark btn-sm">Update Dashboard Now</button>
     </div>
 
     <!-- FILTERS -->
     <div class="filter-section">
-        <div class="row g-4">
-            <div class="col-md-3">
-                <label class="form-label">Search Grade</label>
-                <select id="gradeFilter" class="form-select shadow-sm"><option value="">All Grades</option></select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Search Subject</label>
-                <select id="subjectFilter" class="form-select shadow-sm"><option value="">All Subjects</option></select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Search Teacher</label>
-                <select id="teacherFilter" class="form-select shadow-sm"><option value="">All Teachers</option></select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Search Status</label>
-                <select id="statusFilter" class="form-select shadow-sm"><option value="">All Statuses</option></select>
-            </div>
+        <div class="row g-3">
+            <div class="col-md-3"><label class="form-label small fw-bold">Grade</label><select id="gradeFilter" class="form-select"></select></div>
+            <div class="col-md-3"><label class="form-label small fw-bold">Subject</label><select id="subjectFilter" class="form-select"></select></div>
+            <div class="col-md-3"><label class="form-label small fw-bold">Teacher</label><select id="teacherFilter" class="form-select"></select></div>
+            <div class="col-md-3"><label class="form-label small fw-bold">Status</label><select id="statusFilter" class="form-select"></select></div>
         </div>
     </div>
 
-    <!-- TABLE -->
+    <!-- DATA TABLE -->
     <div class="table-card mb-5">
         <div id="loader" class="text-center py-5">
-            <div class="spinner-grow text-warning" role="status"></div>
-            <p class="mt-3 fw-bold">Loading Teacher Database...</p>
+            <div class="spinner-border text-warning" role="status"></div>
+            <p class="mt-2 fw-bold">Connecting to Elkheta Database...</p>
         </div>
         
         <table id="mainTable" class="table align-middle w-100" style="display:none;">
@@ -184,6 +157,8 @@
                     <th>Teacher Name</th>
                     <th>Status</th>
                     <th>Plan 2025-2026</th>
+                    <th>Plan 2026-2027</th>
+                    <th>Curriculum Analysis</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -191,8 +166,24 @@
     </div>
 </div>
 
+<!-- PREVIEW MODAL -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-dark text-white p-2 px-3">
+                <h6 class="modal-title small">Interface Preview</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="previewFrame" src=""></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
@@ -200,81 +191,105 @@
 <script>
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_Kgkbr1AriHTKkh4q_UFsnZ7dsjY_jmsHnUCAZntKeweqzghGHyhCnXzc64R9QCaiT_yklgUCYRGj/pub?output=csv';
 
-    $(document).ready(function() {
-        // Auto-fetch data
+    $(document).ready(() => {
         Papa.parse(SHEET_URL, {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
+            download: true, header: true, skipEmptyLines: true,
             complete: (results) => renderTable(results.data),
-            error: () => $("#loader").html('<p class="text-danger">Sync Blocked by Browser. Please use manual sync.</p>')
+            error: () => {
+                $("#loader").html('<div class="alert alert-warning">Automatic sync failed. Please use "Sync Data Manually" button above.</div>');
+                $("#manualSyncBox").show();
+            }
         });
     });
 
+    function getGradeClass(grade) {
+        const s = String(grade).toLowerCase();
+        if (s.includes('4') || s.includes('1') || s.includes('7') || s.includes('10')) return 'grade-blue';
+        if (s.includes('5') || s.includes('2') || s.includes('8') || s.includes('11')) return 'grade-teal';
+        if (s.includes('6') || s.includes('3') || s.includes('9') || s.includes('12')) return 'grade-purple';
+        return 'grade-default';
+    }
+
+    function getStatusClass(status) {
+        const s = String(status).toLowerCase();
+        if (s.includes('terminated')) return 'status-terminated';
+        if (s.includes('active') || s.includes('done') || s.includes('hired')) return 'status-active';
+        return 'status-pending';
+    }
+
+    function openPreview(url) {
+        if (!url || url === '-' || url === '') return;
+        let previewUrl = url;
+        if (url.includes('drive.google.com')) {
+            const fileId = url.match(/[-\w]{25,}/);
+            if (fileId) previewUrl = `https://drive.google.com/file/d/${fileId[0]}/preview`;
+        }
+        $('#previewFrame').attr('src', previewUrl);
+        new bootstrap.Modal(document.getElementById('previewModal')).show();
+    }
+
     function processManualData() {
         const text = $("#csvInput").val();
-        Papa.parse(text, {
-            header: true,
-            skipEmptyLines: true,
-            complete: (results) => renderTable(results.data)
+        if(!text) return alert("Please paste data first");
+        Papa.parse(text, { 
+            header: true, 
+            skipEmptyLines: true, 
+            complete: (results) => {
+                renderTable(results.data);
+                $("#manualSyncBox").slideUp();
+            }
         });
     }
 
     function renderTable(data) {
-        $("#loader").hide();
-        $("#mainTable").show();
+        if ($.fn.DataTable.isDataTable('#mainTable')) { $('#mainTable').DataTable().destroy(); }
+        $("#loader").hide(); $("#mainTable").show();
         const tbody = $("#tableBody").empty();
 
         data.forEach(row => {
-            const grade = row.Grade || Object.values(row)[0];
-            const subject = row.Subject || Object.values(row)[1];
-            const teacher = row.Teacher || Object.values(row)[2];
-            const status = row.Status || Object.values(row)[3];
-            const plan = row.Plan || Object.values(row)[4];
+            const cols = Object.values(row);
+            const grade = cols[0] || "";
+            const subject = cols[1] || "";
+            const teacher = cols[2] || "";
+            const status = cols[3] || "";
+            const plan25 = cols[4] || "";
+            const plan26 = cols[5] || ""; 
+            const analysis = cols[6] || "";
 
-            if (!grade || grade.toLowerCase().includes("grade")) return;
+            if (!grade || (grade.toLowerCase().includes("grade") && grade.length > 10)) return;
 
-            const stClass = (status && (status.toLowerCase().includes('done') || status.toLowerCase().includes('active'))) ? 'active-status' : 'pending-status';
-            const planBtn = (plan && plan.includes('http')) ? `<a href="${plan}" target="_blank" class="btn-plan">View Plan</a>` : '<span class="text-muted small">Not Uploaded</span>';
+            const b25 = plan25.includes('http') ? `<button onclick="openPreview('${plan25}')" class="btn-elkheta">View 25-26</button>` : '-';
+            const b26 = plan26.includes('http') ? `<button onclick="openPreview('${plan26}')" class="btn-elkheta">View 26-27</button>` : '-';
+            const bAn = analysis.includes('http') ? `<button onclick="openPreview('${analysis}')" class="btn-analysis">Review Analysis</button>` : '<span class="text-muted">No Data</span>';
 
             tbody.append(`
                 <tr>
-                    <td><span class="grade-tag">${grade}</span></td>
+                    <td><span class="grade-tag ${getGradeClass(grade)}">${grade}</span></td>
                     <td><span class="fw-bold">${subject}</span></td>
                     <td>${teacher}</td>
-                    <td><span class="status-pill ${stClass}">${status}</span></td>
-                    <td>${planBtn}</td>
+                    <td><span class="status-pill ${getStatusClass(status)}">${status}</span></td>
+                    <td>${b25}</td>
+                    <td>${b26}</td>
+                    <td>${bAn}</td>
                 </tr>
             `);
         });
 
-        const table = $('#mainTable').DataTable({
-            pageLength: 20,
-            dom: 'rtip',
-            responsive: true
-        });
+        const table = $('#mainTable').DataTable({ pageLength: 20, dom: 'rtip', responsive: true });
 
-        // Setup Filters
-        const filters = [
-            { id: '#gradeFilter', col: 0 },
-            { id: '#subjectFilter', col: 1 },
-            { id: '#teacherFilter', col: 2 },
-            { id: '#statusFilter', col: 3 }
-        ];
-
-        filters.forEach(f => {
+        // Filter Setup
+        [{id:'#gradeFilter', col:0}, {id:'#subjectFilter', col:1}, {id:'#teacherFilter', col:2}, {id:'#statusFilter', col:3}].forEach(f => {
             const select = $(f.id).empty().append('<option value="">All</option>');
             table.column(f.col).data().unique().sort().each(d => {
-                const text = d.replace(/<\/?[^>]+(>|$)/g, "");
-                if(text) select.append(`<option value="${text}">${text}</option>`);
+                const txt = d.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                if(txt) select.append(`<option value="${txt}">${txt}</option>`);
             });
-            select.off().on('change', function() {
+            select.on('change', function() {
                 const val = $.fn.dataTable.util.escapeRegex($(this).val());
                 table.column(f.col).search(val ? '^' + val + '$' : '', true, false).draw();
             });
         });
     }
 </script>
-
 </body>
 </html>
