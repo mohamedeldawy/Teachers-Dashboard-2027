@@ -51,33 +51,26 @@
             box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
 
-        /* Grade Coloring */
+        /* Grade Tag Base Style */
         .grade-tag {
             font-weight: 700;
-            padding: 5px 12px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.8rem;
             display: inline-block;
-            color: white;
             min-width: 100px;
             text-align: center;
         }
-        .grade-blue { background-color: #4361ee; }   /* Group 1: 1, 4, 7, 10 */
-        .grade-teal { background-color: #2ec4b6; }   /* Group 2: 2, 5, 8, 11 */
-        .grade-purple { background-color: #7209b7; } /* Group 3: 3, 6, 9, 12 */
-        .grade-default { background-color: #6c757d; }
 
-        /* Status Coloring */
+        /* Status Tag Base Style */
         .status-pill {
             padding: 6px 14px;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
+            display: inline-block;
         }
-        .status-terminated { background-color: #dc3545 !important; color: white !important; }
-        .status-active { background-color: #d1e7dd; color: #0f5132; }
-        .status-pending { background-color: #fff3cd; color: #856404; }
 
         /* Buttons */
         .btn-elkheta {
@@ -90,6 +83,7 @@
             border-radius: 6px;
             text-decoration: none;
             transition: 0.2s;
+            display: inline-block;
         }
         .btn-elkheta:hover { background: var(--elkheta-yellow); color: var(--elkheta-dark); }
         
@@ -99,10 +93,14 @@
             border: 1px solid #ced4da;
             padding: 5px 12px;
             font-size: 0.75rem;
+            font-weight: 600;
             border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.2s;
         }
+        .btn-analysis:hover { background: #e9ecef; color: #000; }
 
-        #previewFrame { width: 100%; height: 80vh; border: none; background: #fff; }
         #manualSyncBox { display: none; }
     </style>
 </head>
@@ -111,8 +109,8 @@
 <div class="header-brand">
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-            <!-- Save your uploaded logo image as logo.png in the same folder -->
-            <img src="logo.png" alt="Elkheta Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/150x60?text=Elkheta+Logo'">
+            <!-- Requirement 1: Updated Logo URL -->
+            <img src="https://logo-gold-eta.vercel.app/" alt="Elkheta Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/150x60?text=Elkheta+Logo'">
             <div>
                 <h1 class="h3 mb-0 fw-bold">Elkheta Teachers Dashboard 2026 2027</h1>
                 <p class="mb-0 small text-warning">Quality Control & Performance Tracking</p>
@@ -166,21 +164,6 @@
     </div>
 </div>
 
-<!-- PREVIEW MODAL -->
-<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content shadow-lg">
-            <div class="modal-header bg-dark text-white p-2 px-3">
-                <h6 class="modal-title small">Interface Preview</h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-0">
-                <iframe id="previewFrame" src=""></iframe>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -202,30 +185,30 @@
         });
     });
 
-    function getGradeClass(grade) {
-        const s = String(grade).toLowerCase();
-        if (s.includes('4') || s.includes('1') || s.includes('7') || s.includes('10')) return 'grade-blue';
-        if (s.includes('5') || s.includes('2') || s.includes('8') || s.includes('11')) return 'grade-teal';
-        if (s.includes('6') || s.includes('3') || s.includes('9') || s.includes('12')) return 'grade-purple';
-        return 'grade-default';
+    // Requirement 5: Distinct colors for each Academic Grade
+    function getGradeStyle(grade) {
+        const s = String(grade).trim().toLowerCase();
+        if (s.includes('junior 4') || s === 'j4') return 'background-color: #3a86ff; color: #ffffff;'; // Royal Blue
+        if (s.includes('junior 5') || s === 'j5') return 'background-color: #00b4d8; color: #ffffff;'; // Teal / Cyan
+        if (s.includes('junior 6') || s === 'j6') return 'background-color: #06d6a0; color: #ffffff;'; // Emerald Green
+        if (s.includes('middle 1') || s === 'm1') return 'background-color: #ffb703; color: #000000;'; // Amber Gold
+        if (s.includes('middle 2') || s === 'm2') return 'background-color: #fb8500; color: #ffffff;'; // Orange
+        if (s.includes('middle 3') || s === 'm3') return 'background-color: #f72585; color: #ffffff;'; // Magenta / Pink
+        if (s.includes('senior 1') || s === 's1') return 'background-color: #7209b7; color: #ffffff;'; // Purple
+        if (s.includes('senior 2') || s === 's2') return 'background-color: #4361ee; color: #ffffff;'; // Indigo
+        return 'background-color: #6c757d; color: #ffffff;';
     }
 
-    function getStatusClass(status) {
-        const s = String(status).toLowerCase();
-        if (s.includes('terminated')) return 'status-terminated';
-        if (s.includes('active') || s.includes('done') || s.includes('hired')) return 'status-active';
-        return 'status-pending';
-    }
-
-    function openPreview(url) {
-        if (!url || url === '-' || url === '') return;
-        let previewUrl = url;
-        if (url.includes('drive.google.com')) {
-            const fileId = url.match(/[-\w]{25,}/);
-            if (fileId) previewUrl = `https://drive.google.com/file/d/${fileId[0]}/preview`;
-        }
-        $('#previewFrame').attr('src', previewUrl);
-        new bootstrap.Modal(document.getElementById('previewModal')).show();
+    // Requirement 6: Exact colors for Status column
+    function getStatusStyle(status) {
+        const s = String(status).trim().toLowerCase();
+        if (s.includes('as it is')) return 'background-color: #0d6efd; color: #ffffff;';      // Blue
+        if (s.includes('finetune') || s.includes('fine tune')) return 'background-color: #0dcaf0; color: #000000;'; // Sky Blue
+        if (s.includes('new hire')) return 'background-color: #198754; color: #ffffff;';      // Green
+        if (s.includes('new course')) return 'background-color: #6f42c1; color: #ffffff;';    // Purple
+        if (s.includes('reshoot')) return 'background-color: #fd7e14; color: #ffffff;';       // Orange
+        if (s.includes('terminate')) return 'background-color: #dc3545; color: #ffffff;';     // Red
+        return 'background-color: #6c757d; color: #ffffff;';
     }
 
     function processManualData() {
@@ -258,16 +241,17 @@
 
             if (!grade || (grade.toLowerCase().includes("grade") && grade.length > 10)) return;
 
-            const b25 = plan25.includes('http') ? `<button onclick="openPreview('${plan25}')" class="btn-elkheta">View 25-26</button>` : '-';
-            const b26 = plan26.includes('http') ? `<button onclick="openPreview('${plan26}')" class="btn-elkheta">View 26-27</button>` : '-';
-            const bAn = analysis.includes('http') ? `<button onclick="openPreview('${analysis}')" class="btn-analysis">Review Analysis</button>` : '<span class="text-muted">No Data</span>';
+            // Requirement 4: Open links in a NEW TAB (target="_blank")
+            const b25 = plan25.includes('http') ? `<a href="${plan25}" target="_blank" rel="noopener noreferrer" class="btn-elkheta">View 25-26</a>` : '-';
+            const b26 = plan26.includes('http') ? `<a href="${plan26}" target="_blank" rel="noopener noreferrer" class="btn-elkheta">View 26-27</a>` : '-';
+            const bAn = analysis.includes('http') ? `<a href="${analysis}" target="_blank" rel="noopener noreferrer" class="btn-analysis">Review Analysis</a>` : '<span class="text-muted">No Data</span>';
 
             tbody.append(`
                 <tr>
-                    <td><span class="grade-tag ${getGradeClass(grade)}">${grade}</span></td>
+                    <td><span class="grade-tag" style="${getGradeStyle(grade)}">${grade}</span></td>
                     <td><span class="fw-bold">${subject}</span></td>
                     <td>${teacher}</td>
-                    <td><span class="status-pill ${getStatusClass(status)}">${status}</span></td>
+                    <td><span class="status-pill" style="${getStatusStyle(status)}">${status}</span></td>
                     <td>${b25}</td>
                     <td>${b26}</td>
                     <td>${bAn}</td>
@@ -275,10 +259,82 @@
             `);
         });
 
-        const table = $('#mainTable').DataTable({ pageLength: 20, dom: 'rtip', responsive: true });
+        // Requirement 3: Disable sorting arrows for columns 1 through 6
+        const table = $('#mainTable').DataTable({ 
+            pageLength: 20, 
+            dom: 'rtip', 
+            responsive: true,
+            columnDefs: [
+                { orderable: false, targets: [1, 2, 3, 4, 5, 6] }
+            ]
+        });
 
-        // Filter Setup
-        [{id:'#gradeFilter', col:0}, {id:'#subjectFilter', col:1}, {id:'#teacherFilter', col:2}, {id:'#statusFilter', col:3}].forEach(f => {
+        // Requirement 2: Sort Grade Filter exact custom order
+        const gradeOrder = [
+            "Junior 4", "Junior 5", "Junior 6",
+            "Middle 1", "Middle 2", "Middle 3",
+            "Senior 1", "Senior 2"
+        ];
+
+        const selectGrade = $('#gradeFilter').empty().append('<option value="">All</option>');
+        let uniqueGrades = table.column(0).data().unique().toArray().map(d => d.replace(/<\/?[^>]+(>|$)/g, "").trim()).filter(Boolean);
+
+        uniqueGrades.sort((a, b) => {
+            let indexA = gradeOrder.findIndex(g => a.toLowerCase() === g.toLowerCase());
+            let indexB = gradeOrder.findIndex(g => b.toLowerCase() === g.toLowerCase());
+            if (indexA === -1) indexA = 999;
+            if (indexB === -1) indexB = 999;
+            if (indexA !== indexB) return indexA - indexB;
+            return a.localeCompare(b);
+        });
+
+        uniqueGrades.forEach(g => selectGrade.append(`<option value="${g}">${g}</option>`));
+        selectGrade.on('change', function() {
+            const val = $.fn.dataTable.util.escapeRegex($(this).val());
+            table.column(0).search(val ? '^' + val + '$' : '', true, false).draw();
+        });
+
+        // Requirement 7: Sort Subject Filter ascending (Junior -> Middle -> Senior -> Alphabetical)
+        const subjectRankMap = {};
+        data.forEach(row => {
+            const cols = Object.values(row);
+            const grade = (cols[0] || "").toLowerCase();
+            const subject = (cols[1] || "").trim();
+            if (!subject) return;
+
+            let rank = 4;
+            if (grade.includes('junior') || grade.includes('j4') || grade.includes('j5') || grade.includes('j6')) rank = 1;
+            else if (grade.includes('middle') || grade.includes('m1') || grade.includes('m2') || grade.includes('m3')) rank = 2;
+            else if (grade.includes('senior') || grade.includes('s1') || grade.includes('s2')) rank = 3;
+
+            const sLower = subject.toLowerCase();
+            if (sLower.includes('junior')) rank = 1;
+            else if (sLower.includes('middle')) rank = 2;
+            else if (sLower.includes('senior')) rank = 3;
+
+            if (!subjectRankMap[subject] || rank < subjectRankMap[subject]) {
+                subjectRankMap[subject] = rank;
+            }
+        });
+
+        const selectSubject = $('#subjectFilter').empty().append('<option value="">All</option>');
+        let uniqueSubjects = table.column(1).data().unique().toArray().map(d => d.replace(/<\/?[^>]+(>|$)/g, "").trim()).filter(Boolean);
+
+        uniqueSubjects.sort((a, b) => {
+            const rankA = subjectRankMap[a] || 4;
+            const rankB = subjectRankMap[b] || 4;
+            if (rankA !== rankB) return rankA - rankB;
+            return a.localeCompare(b);
+        });
+
+        uniqueSubjects.forEach(s => selectSubject.append(`<option value="${s}">${s}</option>`));
+        selectSubject.on('change', function() {
+            const val = $.fn.dataTable.util.escapeRegex($(this).val());
+            table.column(1).search(val ? '^' + val + '$' : '', true, false).draw();
+        });
+
+        // Teacher & Status Filters Setup
+        [{id:'#teacherFilter', col:2}, {id:'#statusFilter', col:3}].forEach(f => {
             const select = $(f.id).empty().append('<option value="">All</option>');
             table.column(f.col).data().unique().sort().each(d => {
                 const txt = d.replace(/<\/?[^>]+(>|$)/g, "").trim();
