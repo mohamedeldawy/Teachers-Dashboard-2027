@@ -260,12 +260,24 @@
         });
 
         // Requirement 3: Disable sorting arrows for columns 1 through 6
+        // FIX: Grade (0) and Status (3) columns contain HTML <span> tags.
+        // We add a render function so DataTables uses the plain text (no tags)
+        // when filtering/sorting, while still displaying the styled HTML.
         const table = $('#mainTable').DataTable({ 
             pageLength: 20, 
             dom: 'rtip', 
             responsive: true,
             columnDefs: [
-                { orderable: false, targets: [1, 2, 3, 4, 5, 6] }
+                { orderable: false, targets: [1, 2, 3, 4, 5, 6] },
+                {
+                    targets: [0, 3],
+                    render: function(data, type, row) {
+                        if (type === 'filter' || type === 'sort' || type === 'type') {
+                            return $('<div>').html(data).text().trim();
+                        }
+                        return data; // keep the styled HTML for the actual display
+                    }
+                }
             ]
         });
 
@@ -277,7 +289,11 @@
         ];
 
         const selectGrade = $('#gradeFilter').empty().append('<option value="">All</option>');
-        let uniqueGrades = table.column(0).data().unique().toArray().map(d => d.replace(/<\/?[^>]+(>|$)/g, "").trim()).filter(Boolean);
+        // Use the 'filter' type data (already stripped of HTML by the render function above)
+        let uniqueGrades = table.column(0).data().unique().toArray()
+            .map(d => String(d).replace(/<\/?[^>]+(>|$)/g, "").trim())
+            .filter(Boolean);
+        uniqueGrades = [...new Set(uniqueGrades)];
 
         uniqueGrades.sort((a, b) => {
             let indexA = gradeOrder.findIndex(g => a.toLowerCase() === g.toLowerCase());
@@ -333,18 +349,32 @@
             table.column(1).search(val ? '^' + val + '$' : '', true, false).draw();
         });
 
-        // Teacher & Status Filters Setup
-        [{id:'#teacherFilter', col:2}, {id:'#statusFilter', col:3}].forEach(f => {
-            const select = $(f.id).empty().append('<option value="">All</option>');
-            table.column(f.col).data().unique().sort().each(d => {
-                const txt = d.replace(/<\/?[^>]+(>|$)/g, "").trim();
+        // Teacher Filter Setup (column 2, plain text - no HTML)
+        {
+            const select = $('#teacherFilter').empty().append('<option value="">All</option>');
+            table.column(2).data().unique().sort().each(d => {
+                const txt = String(d).replace(/<\/?[^>]+(>|$)/g, "").trim();
                 if(txt) select.append(`<option value="${txt}">${txt}</option>`);
             });
             select.on('change', function() {
                 const val = $.fn.dataTable.util.escapeRegex($(this).val());
-                table.column(f.col).search(val ? '^' + val + '$' : '', true, false).draw();
+                table.column(2).search(val ? '^' + val + '$' : '', true, false).draw();
             });
-        });
+        }
+
+        // Status Filter Setup (column 3, use stripped 'filter' type data via the render function above)
+        {
+            const select = $('#statusFilter').empty().append('<option value="">All</option>');
+            let uniqueStatuses = table.column(3).data().unique().toArray()
+                .map(d => String(d).replace(/<\/?[^>]+(>|$)/g, "").trim())
+                .filter(Boolean);
+            uniqueStatuses = [...new Set(uniqueStatuses)].sort();
+            uniqueStatuses.forEach(txt => select.append(`<option value="${txt}">${txt}</option>`));
+            select.on('change', function() {
+                const val = $.fn.dataTable.util.escapeRegex($(this).val());
+                table.column(3).search(val ? '^' + val + '$' : '', true, false).draw();
+            });
+        }
     }
 </script>
 </body>
