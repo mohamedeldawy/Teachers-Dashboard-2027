@@ -136,7 +136,11 @@
             <div class="col-md-3"><label class="form-label small fw-bold">Grade</label><select id="gradeFilter" class="form-select"></select></div>
             <div class="col-md-3"><label class="form-label small fw-bold">Subject</label><select id="subjectFilter" class="form-select"></select></div>
             <div class="col-md-3"><label class="form-label small fw-bold">Teacher</label><select id="teacherFilter" class="form-select"></select></div>
-            <div class="col-md-3"><label class="form-label small fw-bold">Status</label><select id="statusFilter" class="form-select"></select></div>
+            <div class="col-md-3">
+                <label for="statusFilter" class="form-label small fw-bold">Status</label>
+                <select id="statusFilter" class="form-select" multiple aria-describedby="statusFilterHelp"></select>
+                <div id="statusFilterHelp" class="form-text">Select multiple statuses; clear all selections to show every status.</div>
+            </div>
         </div>
     </div>
 
@@ -364,15 +368,16 @@
 
         // Status Filter Setup (column 3, use stripped 'filter' type data via the render function above)
         {
-            const select = $('#statusFilter').empty().append('<option value="">All</option>');
+            const select = $('#statusFilter').empty();
             let uniqueStatuses = table.column(3).data().unique().toArray()
                 .map(d => String(d).replace(/<\/?[^>]+(>|$)/g, "").trim())
                 .filter(Boolean);
             uniqueStatuses = [...new Set(uniqueStatuses)].sort();
-            uniqueStatuses.forEach(txt => select.append(`<option value="${txt}">${txt}</option>`));
+            uniqueStatuses.forEach(txt => select.append($('<option>').val(txt).text(txt)));
             select.on('change', function() {
-                const val = $.fn.dataTable.util.escapeRegex($(this).val());
-                table.column(3).search(val ? '^' + val + '$' : '', true, false).draw();
+                const values = ($(this).val() || []).map(value => $.fn.dataTable.util.escapeRegex(value));
+                const pattern = values.length ? `^(?:${values.join('|')})$` : '';
+                table.column(3).search(pattern, true, false).draw();
             });
         }
     }
