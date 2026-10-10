@@ -128,8 +128,7 @@
 <div class="header-brand">
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-            <!-- Requirement 1: Updated Logo URL -->
-            <img src="https://https://logopng-omega.vercel.app/logo.png.vercel.app/" alt="Elkheta Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/150x60?text=Elkheta+Logo'">
+            <img src="https://logopng-omega.vercel.app/logo.png" alt="Elkheta Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/150x60?text=Elkheta+Logo'">
             <div>
                 <h1 class="h3 mb-0 fw-bold">Elkheta Teachers Dashboard 2026 2027</h1>
                 <p class="mb-0 small text-warning">Quality Control & Performance Tracking</p>
@@ -246,45 +245,84 @@
             header: true, 
             skipEmptyLines: true, 
             complete: (results) => {
+                if (results.errors.length) {
+                    alert(`Could not read the pasted CSV: ${results.errors[0].message}`);
+                    return;
+                }
                 renderTable(results.data);
                 $("#manualSyncBox").slideUp();
             }
         });
     }
 
+    function getCellText(value) {
+        return value == null ? "" : String(value).trim();
+    }
+
+    function getSafeHttpUrl(value) {
+        const text = getCellText(value);
+        if (!text) return "";
+
+        try {
+            const url = new URL(text);
+            return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
+        } catch {
+            return "";
+        }
+    }
+
     function renderTable(data) {
         if ($.fn.DataTable.isDataTable('#mainTable')) { $('#mainTable').DataTable().destroy(); }
         $("#loader").hide(); $("#mainTable").show();
         const tbody = $("#tableBody").empty();
+        const getUniqueColumnValues = columnIndex => [...new Set(
+            data
+                .map(row => getCellText(Object.values(row)[columnIndex]))
+                .filter(value => value && !(columnIndex === 0 && value.toLowerCase().includes("grade") && value.length > 10))
+        )];
 
         data.forEach(row => {
             const cols = Object.values(row);
-            const grade = cols[0] || "";
-            const subject = cols[1] || "";
-            const teacher = cols[2] || "";
-            const status = cols[3] || "";
-            const plan25 = cols[4] || "";
-            const plan26 = cols[5] || ""; 
-            const analysis = cols[6] || "";
+            const grade = getCellText(cols[0]);
+            const subject = getCellText(cols[1]);
+            const teacher = getCellText(cols[2]);
+            const status = getCellText(cols[3]);
+            const plan25 = getCellText(cols[4]);
+            const plan26 = getCellText(cols[5]);
+            const analysis = getCellText(cols[6]);
 
             if (!grade || (grade.toLowerCase().includes("grade") && grade.length > 10)) return;
 
-            // Requirement 4: Open links in a NEW TAB (target="_blank")
-            const b25 = plan25.includes('http') ? `<a href="${plan25}" target="_blank" rel="noopener noreferrer" class="btn-elkheta">View 25-26</a>` : '-';
-            const b26 = plan26.includes('http') ? `<a href="${plan26}" target="_blank" rel="noopener noreferrer" class="btn-elkheta">View 26-27</a>` : '-';
-            const bAn = analysis.includes('http') ? `<a href="${analysis}" target="_blank" rel="noopener noreferrer" class="btn-analysis">Review Analysis</a>` : '<span class="text-muted">No Data</span>';
+            const createLink = (value, label, className, fallback) => {
+                const url = getSafeHttpUrl(value);
+                if (!url) return $('<span>', { class: 'text-muted' }).text(fallback);
+                return $('<a>', {
+                    class: className,
+                    href: url,
+                    target: '_blank',
+                    rel: 'noopener noreferrer'
+                }).text(label);
+            };
 
-            tbody.append(`
-                <tr>
-                    <td><span class="grade-tag" style="${getGradeStyle(grade)}">${grade}</span></td>
-                    <td><span class="fw-bold">${subject}</span></td>
-                    <td>${teacher}</td>
-                    <td><span class="status-pill" style="${getStatusStyle(status)}">${status}</span></td>
-                    <td>${b25}</td>
-                    <td>${b26}</td>
-                    <td>${bAn}</td>
-                </tr>
-            `);
+            const rowElement = $('<tr>');
+            rowElement.append(
+                $('<td>').append(
+                    $('<span>', { class: 'grade-tag' })
+                        .attr('style', getGradeStyle(grade))
+                        .text(grade)
+                ),
+                $('<td>').append($('<span>', { class: 'fw-bold' }).text(subject)),
+                $('<td>').text(teacher),
+                $('<td>').append(
+                    $('<span>', { class: 'status-pill' })
+                        .attr('style', getStatusStyle(status))
+                        .text(status)
+                ),
+                $('<td>').append(createLink(plan25, 'View 25-26', 'btn-elkheta', '-')),
+                $('<td>').append(createLink(plan26, 'View 26-27', 'btn-elkheta', '-')),
+                $('<td>').append(createLink(analysis, 'Review Analysis', 'btn-analysis', 'No Data'))
+            );
+            tbody.append(rowElement);
         });
 
         // Requirement 3: Disable sorting arrows for columns 1 through 6
@@ -316,12 +354,8 @@
             "Senior 1", "Senior 2"
         ];
 
-        const selectGrade = $('#gradeFilter').empty().append('<option value="">All</option>');
-        // Use the 'filter' type data (already stripped of HTML by the render function above)
-        let uniqueGrades = table.column(0).data().unique().toArray()
-            .map(d => String(d).replace(/<\/?[^>]+(>|$)/g, "").trim())
-            .filter(Boolean);
-        uniqueGrades = [...new Set(uniqueGrades)];
+        const selectGrade = $('#gradeFilter').empty().append($('<option>').val('').text('All'));
+        let uniqueGrades = getUniqueColumnValues(0);
 
         uniqueGrades.sort((a, b) => {
             let indexA = gradeOrder.findIndex(g => a.toLowerCase() === g.toLowerCase());
@@ -332,8 +366,8 @@
             return a.localeCompare(b);
         });
 
-        uniqueGrades.forEach(g => selectGrade.append(`<option value="${g}">${g}</option>`));
-        selectGrade.on('change', function() {
+        uniqueGrades.forEach(g => selectGrade.append($('<option>').val(g).text(g)));
+        selectGrade.off('change.dashboardFilters').on('change.dashboardFilters', function() {
             const val = $.fn.dataTable.util.escapeRegex($(this).val());
             table.column(0).search(val ? '^' + val + '$' : '', true, false).draw();
         });
@@ -361,8 +395,8 @@
             }
         });
 
-        const selectSubject = $('#subjectFilter').empty().append('<option value="">All</option>');
-        let uniqueSubjects = table.column(1).data().unique().toArray().map(d => d.replace(/<\/?[^>]+(>|$)/g, "").trim()).filter(Boolean);
+        const selectSubject = $('#subjectFilter').empty().append($('<option>').val('').text('All'));
+        let uniqueSubjects = getUniqueColumnValues(1);
 
         uniqueSubjects.sort((a, b) => {
             const rankA = subjectRankMap[a] || 4;
@@ -371,20 +405,19 @@
             return a.localeCompare(b);
         });
 
-        uniqueSubjects.forEach(s => selectSubject.append(`<option value="${s}">${s}</option>`));
-        selectSubject.on('change', function() {
+        uniqueSubjects.forEach(s => selectSubject.append($('<option>').val(s).text(s)));
+        selectSubject.off('change.dashboardFilters').on('change.dashboardFilters', function() {
             const val = $.fn.dataTable.util.escapeRegex($(this).val());
             table.column(1).search(val ? '^' + val + '$' : '', true, false).draw();
         });
 
         // Teacher Filter Setup (column 2, plain text - no HTML)
         {
-            const select = $('#teacherFilter').empty().append('<option value="">All</option>');
-            table.column(2).data().unique().sort().each(d => {
-                const txt = String(d).replace(/<\/?[^>]+(>|$)/g, "").trim();
-                if(txt) select.append(`<option value="${txt}">${txt}</option>`);
+            const select = $('#teacherFilter').empty().append($('<option>').val('').text('All'));
+            getUniqueColumnValues(2).sort().forEach(value => {
+                select.append($('<option>').val(value).text(value));
             });
-            select.on('change', function() {
+            select.off('change.dashboardFilters').on('change.dashboardFilters', function() {
                 const val = $.fn.dataTable.util.escapeRegex($(this).val());
                 table.column(2).search(val ? '^' + val + '$' : '', true, false).draw();
             });
@@ -393,10 +426,7 @@
         // Status Filter Setup (column 3, use stripped 'filter' type data via the render function above)
         {
             const options = $('#statusFilterOptions').empty();
-            let uniqueStatuses = table.column(3).data().unique().toArray()
-                .map(d => String(d).replace(/<\/?[^>]+(>|$)/g, "").trim())
-                .filter(Boolean);
-            uniqueStatuses = [...new Set(uniqueStatuses)].sort();
+            const uniqueStatuses = getUniqueColumnValues(3).sort();
             uniqueStatuses.forEach((status, index) => {
                 const id = `statusFilterOption${index}`;
                 const checkbox = $('<input>', {
